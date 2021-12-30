@@ -20,8 +20,8 @@ AssertOpenGL;
 Screen('Preference','SkipSyncTests', 1);
 [windowPtr, rect] = Screen('OpenWindow',1,[backgroundColor backgroundColor backgroundColor],[],[],2);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% For numerosity simulations %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%For numerosity simulations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 numerosities=1:175;
 dotSize=16;
@@ -59,9 +59,9 @@ end
 power1=power1./powerScale;
 power2=power2./powerScale;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% For item size simulations %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+For item size simulations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 dotSizes=1:255;
 %Initialize array for aggregate Fourier power in the first harmonic
@@ -90,9 +90,9 @@ power1=power1./powerScale;
 power2=power2./powerScale;
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% For item spacing simulations %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+%For item spacing simulations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 canvasSizes=[50:5:500];
 dotSize=16;
 ndots=7;
@@ -137,9 +137,9 @@ end
 power1=power1./powerScale;
 power2=power2./powerScale;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% For item contrast and contrast range simulations %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%For item contrast and contrast range simulations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 blackAndWhite=0;
 normalizedByMeanContrast=1;
 contrastRange=1; %Change contrast (0) or RANGE of contrasts (1)
@@ -335,9 +335,9 @@ for nCorners=3:10
 end
 power1=power1./powerScale;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% For connected pairs of dots %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%For connected pairs of dots
+%%%%%%%%%%%%%%%%%%%%%%%%%%
 dotSize=30;
 lineWidth=4;
 offsetAngle=0; %This can be done at any angle between dots, but 0 (horizontally offset) generalises to other angles.
@@ -426,3 +426,142 @@ for connected=1:6 %1 for unconnected dots, 2 for dots with separate bar rotated 
 end
 
 power1=power1./powerScale;
+
+function dotGroup=newDotPattern(ndots,canvasSize, dotSize, recheckDistance)
+if ndots >0
+    %It is possible that no solution exists for this dot size and spacing,
+    %so limit the number of attempts
+    recheckCounter=10000;
+    while recheckCounter==10000
+    for rdots = 1:ndots
+        tempDotPattern = rand(1,2)*canvasSize;
+        if dotSize>=canvasSize
+            while sqrt((tempDotPattern(1,1)-0.5*canvasSize)^2+(tempDotPattern(1,2)-0.5*canvasSize)^2)>0.5*canvasSize
+                tempDotPattern = rand(1,2)*canvasSize;
+            end            
+        else
+            while sqrt((tempDotPattern(1,1)-0.5*canvasSize)^2+(tempDotPattern(1,2)-0.5*canvasSize)^2)>0.5*canvasSize-dotSize/2
+                tempDotPattern = rand(1,2)*canvasSize;
+            end
+        end
+        A = tempDotPattern(1,1);
+        B = tempDotPattern(1,2);
+
+
+        if rdots == 1
+            dotGroup = tempDotPattern;
+            recheckCounter=1;
+        else
+            recheck = 1;
+            recheckCounter=1;
+            while recheck == 1
+                recheck = 0;
+                for storedDots = 1:size(dotGroup,1)
+                    if recheck == 0
+                        xDist = dotGroup(storedDots,1)-A;
+                        yDist = dotGroup(storedDots,2)-B;
+                        totalDist = sqrt(xDist^2 + yDist^2);
+                        if totalDist < (dotSize * recheckDistance)
+                            recheck = 1;
+                        end
+                    end
+                end
+
+
+                if recheck == 0
+
+                    dotGroup(rdots,1) = A;
+                    dotGroup(rdots,2) = B;
+                else
+                    tempDotPattern = rand(1,2)*canvasSize;
+
+                        while sqrt((tempDotPattern(1,1)-0.5*canvasSize)^2+(tempDotPattern(1,2)-0.5*canvasSize)^2)>0.5*canvasSize-dotSize/2
+                            tempDotPattern = rand(1,2)*canvasSize;
+                        end
+                    A = tempDotPattern(1,1);
+                    B = tempDotPattern(1,2);
+                    recheckCounter=recheckCounter+1;
+                    if recheckCounter==10000
+                        dotGroup(rdots,:)=dotGroup(rdots-1,:);
+                        break;
+                    end
+                end
+            end
+        end
+    end
+    end
+else dotGroup = []; %#ok<SEPEX>
+end
+
+end
+
+function dotGroup=newDotPatternDense(ndots, canvasSize, dotSize, recheckDistance)
+
+groupCanvasSize=canvasSize/2;
+center=rand(1,2)*(canvasSize-groupCanvasSize)+groupCanvasSize/2;
+while sqrt((center(1,1)-0.5*canvasSize)^2+(center(1,2)-0.5*canvasSize)^2)>0.5*(canvasSize-groupCanvasSize)-dotSize/2
+    center = rand(1,2)*(canvasSize-groupCanvasSize)+groupCanvasSize/2;
+end
+canvasSize=groupCanvasSize;
+if ndots >0
+    %It is possible that no solution exists for this dot size and spacing,
+    %so limit the number of attempts
+    recheckCounter=10000;
+    while recheckCounter==10000
+    for rdots = 1:ndots
+        tempDotPattern = rand(1,2)*canvasSize+center-[canvasSize/2, canvasSize/2];
+
+        while sqrt((tempDotPattern(1,1)-center(1))^2+(tempDotPattern(1,2)-center(2))^2)>0.5*canvasSize-dotSize/2
+            tempDotPattern = rand(1,2)*canvasSize+center-[canvasSize/2, canvasSize/2];
+        end
+        A = tempDotPattern(1,1);
+        B = tempDotPattern(1,2);
+
+
+        if rdots == 1
+            dotGroup = tempDotPattern;
+            recheckCounter=1;
+        else
+            recheck = 1;
+            recheckCounter=1;
+            while recheck == 1
+                recheck = 0;
+                for storedDots = 1:size(dotGroup,1)
+                    if recheck == 0
+                        xDist = dotGroup(storedDots,1)-A;
+                        yDist = dotGroup(storedDots,2)-B;
+                        totalDist = sqrt(xDist^2 + yDist^2);
+                        if totalDist < (dotSize * recheckDistance)
+                            recheck = 1;
+                        end
+                    end
+                end
+
+
+                if recheck == 0
+
+                    dotGroup(rdots,1) = A;
+                    dotGroup(rdots,2) = B;
+                else
+                    tempDotPattern = rand(1,2)*canvasSize;
+                    
+                    while sqrt((tempDotPattern(1,1)-center(1))^2+(tempDotPattern(1,2)-center(2))^2)>0.5*canvasSize-dotSize/2
+                        tempDotPattern = rand(1,2)*canvasSize+center-[canvasSize/2, canvasSize/2];
+                    end
+                    
+                    A = tempDotPattern(1,1);
+                    B = tempDotPattern(1,2);
+                    recheckCounter=recheckCounter+1;
+                    if recheckCounter==10000
+                        dotGroup(rdots,:)=dotGroup(rdots-1,:);
+                        break;
+                    end
+                end
+            end
+        end
+    end
+    end
+else dotGroup = []; %#ok<SEPEX>
+end
+
+end
