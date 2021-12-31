@@ -234,25 +234,25 @@ set(gca, 'YTickLabel', 0:.5:4)
 
 %% Linear response model
 cd('/mnt/data/CueStimuliScriptsParams/Linear')
-load('params_NumberArea.mat')
+load('params_NumbersArea.mat')
 for n = 1:length(ndots)
     params.dotOrder(params.dotOrder == ndots(n)) = ConstantTotalArea.meanSumToMin(n);
 end
 save('params_AggFourierPowerArea.mat', 'params')
 
-load('params_NumberArea.mat')
+load('params_NumbersArea.mat')
 for n = 1:length(ndots)
     params.dotOrder(params.dotOrder == ndots(n)) = ConstantItemSize.meanSumToMin(n);
 end
 save('params_AggFourierPowerRadius.mat', 'params')
 
-load('params_NumberArea.mat')
+load('params_NumbersArea.mat')
 for n = 1:length(ndots)
     params.dotOrder(params.dotOrder == ndots(n)) = ConstantTotalPerimeter.meanSumToMin(n);
 end
 save('params_AggFourierPowerCirc.mat', 'params')
 
-load('params_NumberArea.mat')
+load('params_NumbersArea.mat')
 for n = 1:length(ndots)
     params.dotOrder(params.dotOrder == ndots(n)) = HighDensity.meanSumToMin(n);
 end
@@ -261,25 +261,25 @@ save('params_AggFourierPowerDense.mat', 'params')
 %% Log response model
 % For log response models, add 1 to result to avoid crossing zero
 cd('/mnt/data/CueStimuliScriptsParams/Log')
-load('params_NumberArea.mat')
+load('params_NumbersArea.mat')
 for n = 1:length(ndots)
     params.dotOrder(params.dotOrder == ndots(n)) = log(ConstantTotalArea.meanSumToMin(n))+1;
 end
 save('params_AggFourierPowerArea.mat', 'params')
 
-load('params_NumberArea.mat')
+load('params_NumbersArea.mat')
 for n = 1:length(ndots)
     params.dotOrder(params.dotOrder == ndots(n)) = log(ConstantItemSize.meanSumToMin(n))+1;
 end
 save('params_AggFourierPowerRadius.mat', 'params')
 
-load('params_NumberArea.mat')
+load('params_NumbersArea.mat')
 for n = 1:length(ndots)
     params.dotOrder(params.dotOrder == ndots(n)) = log(ConstantTotalPerimeter.meanSumToMin(n))+1;
 end
 save('params_AggFourierPowerCirc.mat', 'params')
 
-load('params_NumberArea.mat')
+load('params_NumbersArea.mat')
 for n = 1:length(ndots)
     params.dotOrder(params.dotOrder == ndots(n)) = log(HighDensity.meanSumToMin(n))+1;
 end
